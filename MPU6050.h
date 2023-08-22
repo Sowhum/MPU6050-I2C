@@ -32,12 +32,12 @@
 
 struct AStruct//acceleration
 {
-    float XAxis,YAxis,Zaxis;
+    float XAxis,YAxis,ZAxis;
 };
 
 struct GStruct//gyroscope
 {
-    float XAxis,YAxis,Zaxis;
+    float XAxis,YAxis,ZAxis;
 };
 
 struct TStruct//temperature
@@ -45,15 +45,23 @@ struct TStruct//temperature
     float TempC;
 };
 
+
+
 class MPU{
 public:
     //config functions
     void pwr_setup();
-    void gyro_setup();
-    void acc_setup();
+    void gyro_setup(int range);
+    void acc_setup(int range);
 
+    //variables
+    float GyroRange[4]={131.0,65.5,32.8,16.4};
+    float AccelRange[4]={16384.0,8192.0,4096.0,2048.0};
+    
     //data read functions
-    void get_acc(float Anum,struct Astruct acc);
+    void get_acc(int Anum,AStruct acc);
+    void get_gyro(int Gnum,GStruct gyro);
+    void get_temp(TStruct temp);
 
 };
 
