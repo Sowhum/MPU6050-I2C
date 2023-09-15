@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include "MPU6050.h"
 
-Wire.begin();
 
 void MPU::pwr_setup(){//power management registers setup
     Wire.beginTransmission(ADDR);
@@ -47,7 +46,7 @@ void MPU::acc_setup(int range){//accelerometer registers setuo
     Wire.endTransmission(true);
 }
 
-void MPU::get_acc(int Anum, AStruct acc){
+void MPU::get_acc(int Anum, struct AStruct *acc){
     Wire.beginTransmission(ADDR);
     Wire.write(ACCEL_XOUT_H);
     Wire.endTransmission(false);
@@ -57,14 +56,14 @@ void MPU::get_acc(int Anum, AStruct acc){
     int16_t ydata=Wire.read()<<8|Wire.read();
     int16_t zdata=Wire.read()<<8|Wire.read();
 
-    acc.XAxis=(float)xdata/AccelRange[Anum];
-    acc.YAxis=(float)ydata/AccelRange[Anum];
-    acc.ZAxis=(float)zdata/AccelRange[Anum];
+    acc->XAxis=(float)xdata/AccelRange[Anum];
+    acc->YAxis=(float)ydata/AccelRange[Anum];
+    acc->ZAxis=(float)zdata/AccelRange[Anum];
 
     Wire.endTransmission(true);
 }
 
-void MPU::get_temp(TStruct temp){
+void MPU::get_temp(struct TStruct *temp){
     Wire.beginTransmission(ADDR);
     Wire.write(TEMP_OUT_H);
     Wire.endTransmission(false);
@@ -72,12 +71,12 @@ void MPU::get_temp(TStruct temp){
     
     int16_t tdata=Wire.read()<<8|Wire.read();
 
-    temp.TempC=float(tdata)/340 +36.53;
+    temp->TempC=float(tdata)/340 +36.53;
 
     Wire.endTransmission(true);
 }
 
-void MPU::get_gyro(int Gnum, GStruct gyro){
+void MPU::get_gyro(int Gnum,struct GStruct *gyro){
     Wire.beginTransmission(ADDR);
     Wire.write(GYRO_XOUT_H);
     Wire.endTransmission(false);
@@ -87,10 +86,9 @@ void MPU::get_gyro(int Gnum, GStruct gyro){
     int16_t ydata=Wire.read()<<8|Wire.read();
     int16_t zdata=Wire.read()<<8|Wire.read();
     
-    gyro.XAxis=(float)xdata/GyroRange[Gnum];
-    gyro.YAxis=(float)ydata/GyroRange[Gnum];
-    gyro.ZAxis=(float)zdata/GyroRange[Gnum];
+    gyro->XAxis=xdata/GyroRange[Gnum];
+    gyro->YAxis=(float)ydata/GyroRange[Gnum];
+    gyro->ZAxis=(float)zdata/GyroRange[Gnum];
 
     Wire.endTransmission(true);
 }
-
