@@ -9,7 +9,7 @@ GStruct g;
 
 void setup() {  
 
-  Wire.begin(21,22);
+  Wire.begin(21,22);//SDA SCL pins
 
   Serial.begin(9600);
   mpu.pwr_setup();
@@ -18,7 +18,7 @@ void setup() {
   delay(5000);
 }
 int main(void){}
-
+//print functions --ignore--
 void print_acc(){
   Serial.print("ACC X Y Z : \t");
   Serial.print(a.XAxis);Serial.print("\t");
