@@ -13,6 +13,7 @@ void MPU::pwr_setup(){//power management registers setup
 void MPU::gyro_setup(int range){//gyroscope registers setup
     Wire.beginTransmission(ADDR);
     Wire.write(GYRO_CONFIG);
+    //RANGE values (0 to 3) corresponds to scale of +- 250, 500, 1000, 2000 °/s
    if(range==0){
          Wire.write(0x00);
     }
@@ -31,6 +32,7 @@ void MPU::gyro_setup(int range){//gyroscope registers setup
 void MPU::acc_setup(int range){//accelerometer registers setup
     Wire.beginTransmission(ADDR);
     Wire.write(ACC_CONFIG);
+    //RANGE values (0 to 3) corresponds to scale of +- 2, 4, 8, 16 g
     if(range==0){
          Wire.write(0x00);
     }
@@ -47,7 +49,7 @@ void MPU::acc_setup(int range){//accelerometer registers setup
     Wire.endTransmission(true);
 }
 
-void MPU::get_acc(int Anum, struct AStruct *acc){
+void MPU::get_acc(int Anum, struct AStruct *acc){//reading from 6 registers starting from XOUT_H
     Wire.beginTransmission(ADDR);
     Wire.write(ACCEL_XOUT_H);
     Wire.endTransmission(false);
@@ -64,7 +66,7 @@ void MPU::get_acc(int Anum, struct AStruct *acc){
     Wire.endTransmission(true);
 }
 
-void MPU::get_temp(struct TStruct *temp){
+void MPU::get_temp(struct TStruct *temp){//reading from 2 registers starting from TEMP_OUT_H
     Wire.beginTransmission(ADDR);
     Wire.write(TEMP_OUT_H);
     Wire.endTransmission(false);
@@ -77,7 +79,7 @@ void MPU::get_temp(struct TStruct *temp){
     Wire.endTransmission(true);
 }
 
-float MPU::get_gyro(int Gnum,struct GStruct *gyro){
+float MPU::get_gyro(int Gnum,struct GStruct *gyro){//reading from 6 registers starting from XOUT_H
     Wire.beginTransmission(ADDR);
     Wire.write(GYRO_XOUT_H);
     Wire.endTransmission(true);
