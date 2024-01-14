@@ -1,9 +1,12 @@
 #ifndef MPU6050_H
+#include <Wire.h>
+#include<Arduino.h>
+#include <stdint.h>
 
 #define MPU6050_H
 
 #define ADDR 0x68
-    
+#define WIRE Wire
 //IMU Configurations registers
 #define PWR_MGMT_1 0x6B
 #define GYRO_CONFIG 0x1B
@@ -49,7 +52,8 @@ struct TStruct//temperature
 
 class MPU{
 public:
-
+    //error check
+    bool readFail=false;
     //range variables 
     float GyroRange[4]={131.0,65.5,32.8,16.4};
     float AccelRange[4]={16384.0,8192.0,4096.0,2048.0};
