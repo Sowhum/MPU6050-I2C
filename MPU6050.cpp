@@ -36,7 +36,7 @@ void MPU::acc_setup(int range){//accelerometer registers setup
          WIRE.write(0x00);
     }
     else if(range==1){
-         WIRE.write(0x8);
+         WIRE.write(0x08);
     }
     else if(range==2){
          WIRE.write(0x10);
@@ -44,7 +44,11 @@ void MPU::acc_setup(int range){//accelerometer registers setup
     else if(range==3){
          WIRE.write(0x18);
     }
+    WIRE.endTransmission(true);
 
+    WIRE.beginTransmission(ADDR);
+    WIRE.write(ACCEL_CONFIG_2);
+    WIRE.write(0x03); 
     WIRE.endTransmission(true);
 }
 
@@ -85,7 +89,7 @@ void MPU::get_temp(struct TStruct *temp){
     
     int16_t tdata=WIRE.read()<<8|WIRE.read();
 
-    temp->TempC=float(tdata)/340 +36.53;
+    temp->TempC=float(tdata-21)/333.87 +21;
 
     WIRE.endTransmission(true);
 }
@@ -93,7 +97,7 @@ void MPU::get_temp(struct TStruct *temp){
 void MPU::get_gyro(int Gnum,struct GStruct *gyro){
     WIRE.beginTransmission(ADDR);
     WIRE.write(GYRO_XOUT_H);
-    WIRE.endTransmission(true);
+    WIRE.endTransmission(false);
     WIRE.requestFrom(mpuaddr,(size_t)6,true);  
     
     int16_t xdata=WIRE.read()<<8|WIRE.read();

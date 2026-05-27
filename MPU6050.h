@@ -11,6 +11,7 @@
 #define PWR_MGMT_1 0x6B
 #define GYRO_CONFIG 0x1B
 #define ACC_CONFIG 0x1C
+#define ACC_CONFIG_2 0x1D
 
 //IMU Data measurements registers 
 
