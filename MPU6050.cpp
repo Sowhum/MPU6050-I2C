@@ -4,70 +4,71 @@
 uint8_t mpuaddr=0x68;
 
 
-void MPU::pwr_setup(){//power management registers setup
+bool MPU::pwr_setup(){//power management registers setup
     WIRE.beginTransmission(ADDR);
     WIRE.write(PWR_MGMT_1);
     WIRE.write(0x01);
-    WIRE.endTransmission(true);
+    return(WIRE.endTransmission(true)==0);
 }
 
-void MPU::gyro_setup(int range){//gyroscope registers setup
+bool MPU::gyro_setup(int range){//gyroscope registers setup
     WIRE.beginTransmission(ADDR);
     WIRE.write(GYRO_CONFIG);
-   if(range==0){
-         WIRE.write(0x00);
+    if(range==0){
+        WIRE.write(0x00);
     }
     else if(range==1){
-         WIRE.write(0x08);
+        WIRE.write(0x08);
     }
     else if(range==2){
-         WIRE.write(0x10);
+        WIRE.write(0x10);
     }
     else if(range==3){
-         WIRE.write(0x18);
+        WIRE.write(0x18);
     }
-    WIRE.endTransmission(true);
+    return(WIRE.endTransmission(true)==0);
 }
 
-void MPU::acc_setup(int range){//accelerometer registers setup
+bool MPU::acc_setup(int range){//accelerometer registers setup
     WIRE.beginTransmission(ADDR);
     WIRE.write(ACC_CONFIG);
     if(range==0){
-         WIRE.write(0x00);
+        WIRE.write(0x00);
     }
     else if(range==1){
-         WIRE.write(0x08);
+        WIRE.write(0x8);
     }
     else if(range==2){
-         WIRE.write(0x10);
+        WIRE.write(0x10);
     }
     else if(range==3){
-         WIRE.write(0x18);
+        WIRE.write(0x18);
     }
     WIRE.endTransmission(true);
 
     WIRE.beginTransmission(ADDR);
-    WIRE.write(ACCEL_CONFIG_2);
-    WIRE.write(0x03); 
-    WIRE.endTransmission(true);
+    WIRE.write(ACC_CONFIG_2);
+    WIRE.write(0x03);
+    return(WIRE.endTransmission(true)==0);
 }
 
-void MPU::get_acc(int Anum, struct AStruct *acc){
+bool MPU::getErr(){
+    return readFail;
+}
+bool MPU::get_acc(int Anum, struct AStruct *acc){
     WIRE.beginTransmission(ADDR);
     WIRE.write(ACCEL_XOUT_H);
     WIRE.endTransmission(false);
     WIRE.requestFrom(mpuaddr,(size_t)6,true);
-    
-    try{
-     int bytesAvailable = WIRE.available();
-     if(bytesAvailable==0){
-          throw(0);
-          }
+
+    int bytesAvailable = WIRE.available();
+    if(bytesAvailable==0){
+        Serial.println("No bytes available to read");
+        readFail=true;
     }
-    catch(...){
-     Serial.println("No bytes available to read");
-     readFail=true;
-     delay(200);
+
+    else{
+        readFail=false;
     }
 
     int16_t xdata=WIRE.read()<<8|WIRE.read();
@@ -81,12 +82,12 @@ void MPU::get_acc(int Anum, struct AStruct *acc){
     WIRE.endTransmission(true);
 }
 
-void MPU::get_temp(struct TStruct *temp){
+bool MPU::get_temp(struct TStruct *temp){
     WIRE.beginTransmission(ADDR);
     WIRE.write(TEMP_OUT_H);
     WIRE.endTransmission(false);
-    WIRE.requestFrom(mpuaddr,(size_t)2,true);  
-    
+    WIRE.requestFrom(mpuaddr,(size_t)2,true);
+
     int16_t tdata=WIRE.read()<<8|WIRE.read();
 
     temp->TempC=float(tdata-21)/333.87 +21;
@@ -94,19 +95,47 @@ void MPU::get_temp(struct TStruct *temp){
     WIRE.endTransmission(true);
 }
 
-void MPU::get_gyro(int Gnum,struct GStruct *gyro){
+bool MPU::get_gyro(int Gnum,struct GStruct *gyro){
     WIRE.beginTransmission(ADDR);
     WIRE.write(GYRO_XOUT_H);
-    WIRE.endTransmission(false);
-    WIRE.requestFrom(mpuaddr,(size_t)6,true);  
-    
+    WIRE.endTransmission(true);
+    WIRE.requestFrom(mpuaddr,(size_t)6,true);
+
+    int bytesAvailable = WIRE.available();
+    if(bytesAvailable==0){
+        Serial.println("No bytes available to read");
+        readFail=true;
+    }
+
+    else{
+        readFail=false;
+    }
+
     int16_t xdata=WIRE.read()<<8|WIRE.read();
     int16_t ydata=WIRE.read()<<8|WIRE.read();
     int16_t zdata=WIRE.read()<<8|WIRE.read();
-    
+
     gyro->XAxis=(float)xdata/GyroRange[Gnum];
     gyro->YAxis=(float)ydata/GyroRange[Gnum];
     gyro->ZAxis=(float)zdata/GyroRange[Gnum];
 
     WIRE.endTransmission(true);
+
+    return(readFail);
+}
+
+bool MPU::init(int range_gyro, int range_acc){
+
+    if(!pwr_setup()){
+        return false;
+    }
+
+    if(!acc_setup(range_acc)){
+        return false;
+    }
+
+    if(!gyro_setup(range_gyro)){
+        return false;
+    }
+    return true;
 }
