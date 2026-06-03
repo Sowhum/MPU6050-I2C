@@ -6,7 +6,7 @@
 
     #define __MPU6050_H__
 
-    #define ADDR 0x68
+    #define ADDR 0x69
     #define WIRE Wire
     //IMU Configurations registers
     #define PWR_MGMT_1 0x6B

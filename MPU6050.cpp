@@ -1,7 +1,7 @@
 
 #include "MPU6050.h"
 
-uint8_t mpuaddr=0x68;
+uint8_t mpuaddr=0x69;
 
 
 bool MPU::pwr_setup(){//power management registers setup
